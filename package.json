@@ -1,0 +1,14 @@
+{
+  "name": "base-256",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "suthar.ashok@outlook.com <Ashok>",
+  "license": "MIT",
+  "dependencies": {
+    "bignum": "^0.12.5"
+  }
+}
