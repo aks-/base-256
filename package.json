@@ -1,7 +1,7 @@
 {
   "name": "base-256",
   "version": "1.0.0",
-  "description": "",
+  "description": "encode and decode base256 encoding  as gnu-tar does",
   "main": "index.js",
   "scripts": {
     "test": "node test.js"
