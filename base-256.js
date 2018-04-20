@@ -2,7 +2,7 @@ const BigNum = require('bignum')
 
 const decode = buf => {
   var uint64 = new BigNum(0)
-  if (buf.length > 0 && (buf[0]&0x80) != 0) {
+  if (buf.length > 0 && ((buf[0]&0x80) - 128) != 0) {
     var byte = 0x00
     if (!!(buf[0]&0x40) != 0) {
       byte = 0xff
