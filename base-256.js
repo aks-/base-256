@@ -56,10 +56,11 @@ const encode = (buf, num) => {
   const buflen = buf.length
   var bufPointer = buflen - 1
   if (fitsInBase256(buflen, num)) {
+    const numbuf = num.toBuffer()
     for (var i = buflen - 1; i >= 0; i--) {
-      const byte = num.toBuffer()[i]
+      const byte = numbuf[i]
       if (byte) {
-        buf[bufPointer--] = num.toBuffer()[i]
+        buf[bufPointer--] = byte
       }
       num.shiftRight(8)
     }
