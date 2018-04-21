@@ -6,6 +6,8 @@ encode and decode base256 encoding  as gnu-tar does (supported range is -2147483
 npm install base-256
 ```
 
+[![Build Status](https://travis-ci.org/aks-/base-256.svg?branch=master)](https://travis-ci.org/aks-/base-256)
+
 ## Usage
 
 ``` js
