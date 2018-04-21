@@ -8,6 +8,9 @@ npm install base-256
 
 [![Build Status](https://travis-ci.org/aks-/base-256.svg?branch=master)](https://travis-ci.org/aks-/base-256)
 
+## How it is different than buffer.writeInt32BE
+It's a variable length encoding.
+
 ## Usage
 
 ``` js
