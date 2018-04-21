@@ -61,9 +61,34 @@ const testEncoder = () => {
   })
 }
 
-const testErrorCase = () => {
+const testErrors = () => {
+  testDecoderErrors()
+  testEncoderErrors()
+}
+
+const testDecoderErrors = () => {
+  assert.throws(
+    () => { decode({}) },
+    /^TypeError: decode only accepts buffer.$/
+  )
+}
+
+const testEncoderErrors = () => {
   const buf = new Buffer("\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 'binary')
-  assert.throws(() => { encode(buf, 2147483648) }, TypeError)
+  assert.throws(
+    () => { encode(buf, 2147483648) },
+    /^TypeError: number should be between range -2147483648 to 2147483647.$/
+  )
+
+  assert.throws(
+    () => { encode({}, 2147483648) },
+    /^TypeError: encode expects first parameter to be buffer.$/
+  )
+
+  assert.throws(
+    () => { encode(buf, {}) },
+    /^TypeError: encode expects second parameter to be integer.$/
+  )
 }
 
 const areBuffersEqual = (buf, buf2) => {
@@ -79,4 +104,4 @@ const areBuffersEqual = (buf, buf2) => {
 
 testDecoder()
 testEncoder()
-testErrorCase()
+testErrors()

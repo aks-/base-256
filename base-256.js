@@ -1,4 +1,8 @@
 const decode = buf => {
+  if (!Buffer.isBuffer(buf)) {
+    throw new TypeError('decode only accepts buffer.')
+  }
+
   var num = 0
   if (buf.length > 0 && (buf[0]&0x80) != 0) {
     var byte = 0x00
@@ -37,6 +41,16 @@ const decode = buf => {
 }
 
 const encode = (buf, num) => {
+  if (!Buffer.isBuffer(buf)) {
+    throw new TypeError('encode expects first parameter to be buffer.')
+  }
+
+  num = Number(num)
+
+  if (isNaN(num) || (!Number.isInteger(num))) {
+    throw new TypeError('encode expects second parameter to be integer.')
+  }
+
   if (!isEncodable(num)) {
     throw new TypeError('number should be between range -2147483648 to 2147483647.')
   }
