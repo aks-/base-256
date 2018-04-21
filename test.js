@@ -15,20 +15,20 @@ const testDecoder = () => {
     ["\xc0", -1 * (1 << 6)],
     ["\xc0\x00", -1 * (1 << 14)],
     ["\xc0\x00\x00", -1 * (1 << 22)],
-    ["\x87\x76\xa2\x22\xeb\x8a\x72\x61", "537795476381659745"],
-    ["\x80\x00\x00\x00\x07\x76\xa2\x22\xeb\x8a\x72\x61", "537795476381659745"],
-    ["\xf7\x76\xa2\x22\xeb\x8a\x72\x61", "-615126028225187231"],
-    ["\xff\xff\xff\xff\xf7\x76\xa2\x22\xeb\x8a\x72\x61", "-615126028225187231"],
-    ["\x80\x7f\xff\xff\xff\xff\xff\xff\xff", "9223372036854775807"],
+    ["\x80\x7f\xff\xff\xff", 2147483647],
+    ["\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 2147483647],
+    ["\xff\x80\x00\x00\x00", -2147483648],
+    ["\xff\xff\xff\xff\x80\x00\x00\x00", -2147483648],
+    ["\x80\x7f\xff\xff\xff\xff\xff\xff\xff", 0],
     ["\x80\x80\x00\x00\x00\x00\x00\x00\x00", 0],
-    ["\xff\x80\x00\x00\x00\x00\x00\x00\x00", "-9223372036854775808"],
+    ["\xff\x80\x00\x00\x00\x00\x00\x00\x00", 0],
     ["\xff\x7f\xff\xff\xff\xff\xff\xff\xff", 0],
     ["\xf5\xec\xd1\xc7\x7e\x5f\x26\x48\x81\x9f\x8f\x9b", 0]]
 
   inputOutputPairs.forEach(pair => {
     const buf = new Buffer(pair[0], 'binary')
     const decodedBigNum = decode(buf)
-    assert(decodedBigNum.toString(), pair[1])
+    assert.equal(decodedBigNum, pair[1])
   })
 }
 
@@ -47,18 +47,29 @@ const testEncoder = () => {
     [-1*(1<<8) - 1, "0\x00"],
     [-1 * (1 << 16), "\xff\x00\x00"],
     [-1*(1<<16) - 1, "00\x00"],
-    ["537795476381659745", "0000000\x00"],
-    ["537795476381659745", "\x80\x00\x00\x00\x07\x76\xa2\x22\xeb\x8a\x72\x61"],
-    ["9223372036854775807", "0000000\x00"],
-    ["9223372036854775807", "\x80\x00\x00\x00\x7f\xff\xff\xff\xff\xff\xff\xff"],
-    ["9223372036854775807", "\x80\x7f\xff\xff\xff\xff\xff\xff\xff"]]
+    [2147483647, "\x80\x7f\xff\xff\xff"],
+    [2147483647, "\x80\x00\x00\x00\x00\x7f\xff\xff\xff"],
+    [-2147483648, "\xff\x80\x00\x00\x00"],
+    [-2147483648, "\xff\xff\xff\xff\x80\x00\x00\x00"]]
 
   inputOutputPairs.forEach(pair => {
     const tempbuf = new Buffer(pair[1], 'binary')
     const buf = new Buffer(tempbuf.length)
+    tempbuf.copy(buf)
     encode(buf, pair[0])
-    assert(buf, pair[1])
+    assert.ok(areBuffersEqual(buf, tempbuf))
   })
+}
+
+const areBuffersEqual = (buf, buf2) => {
+  if (buf.length !== buf2.length) return false 
+
+  var isBuffer = true
+  for (var i = 0; i < buf.length; i++) {
+    if (buf[i] !== buf2[i]) isBuffer = false
+  }
+
+  return isBuffer
 }
 
 testDecoder()

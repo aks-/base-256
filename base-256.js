@@ -1,8 +1,6 @@
-const BigNum = require('bignum')
-
 const decode = buf => {
-  var uint64 = new BigNum(0)
-  if (buf.length > 0 && ((buf[0]&0x80) - 128) != 0) {
+  var num = 0
+  if (buf.length > 0 && (buf[0]&0x80) != 0) {
     var byte = 0x00
     if (!!(buf[0]&0x40) != 0) {
       byte = 0xff
@@ -16,57 +14,57 @@ const decode = buf => {
         c &= 0x7f
       }
 
-      uint64 = new BigNum(uint64)
-
-      if (uint64.shiftRight(56).gt(0)) {
-        return
+      if ((num >>> 24) > 0) {
+        return 0
       }
 
-      uint64 = uint64.shiftLeft(8).or(c)
+      num = (num << 8) | c
     }
 
-    if (uint64.shiftRight(63).gt(0)) {
-      return
+    if ((num >>> 31) > 0) {
+      return 0
     }
 
     if (byte === 0xff) {
-      return uint64.add(1).neg()
+      num += 1
+      return -num
     }
 
-    return uint64
+    return num
   }
 
-  return uint64
+  return num
 }
 
-const fitsInBase256 = (buflength, bignum) => {
+const isEncodable = num => {
+  return (num <= 2147483647) ||  (num >= -2147483648)
+}
+
+const fitsInBase256 = (buflength, num) => {
   var binBits = (buflength -1) * 8
   return buflength >= 9 ||
     (
-      bignum.ge(binBits << -1 & 0xFF) &&
-      bignum.lt(binBits << 1 & 0xFF)
+      (num >= (-1 << binBits)) &&
+      (num < (1 << binBits))
     )
 }
 
 const encode = (buf, num) => {
-  if (!BigNum.isBigNum(num)) {
-    num = new BigNum(num)
+  if (!isEncodable(num)) {
+    throw new Error('number should be between range -2147483648 to 2147483647.')
   }
 
   const buflen = buf.length
   var bufPointer = buflen - 1
+
   if (fitsInBase256(buflen, num)) {
-    const numbuf = num.toBuffer()
     for (var i = buflen - 1; i >= 0; i--) {
-      const byte = numbuf[i]
-      if (byte) {
-        buf[bufPointer--] = byte
-      }
-      num.shiftRight(8)
+      const byte = num & 0xFF
+      buf[bufPointer--] = byte
+      num >>= 8
     }
 
     buf[0] |= 0x80
-    return
   }
 }
 

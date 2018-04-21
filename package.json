@@ -8,7 +8,5 @@
   },
   "author": "suthar.ashok@outlook.com <Ashok>",
   "license": "MIT",
-  "dependencies": {
-    "bignum": "^0.12.5"
-  }
+  "dependencies": {}
 }
