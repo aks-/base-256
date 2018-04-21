@@ -26,6 +26,10 @@ Pass a buffer and the number that needs to be encoded. The number will be encode
 `base256.decode(buf)`
 Decode a number from a buffer
 
+## Errors
+- Throws `TypeError` if the input yields a number that is out of range (-2147483648 to 2147483647).
+- Throws `TypeError` if the input is of not correct type.
+
 ## License
 
 MIT
