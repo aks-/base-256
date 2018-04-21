@@ -1,6 +1,6 @@
 {
   "name": "base-256",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "encode and decode base256 encoding  as gnu-tar does",
   "repository": {
     "type": "git",
