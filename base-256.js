@@ -38,7 +38,7 @@ const decode = buf => {
 
 const encode = (buf, num) => {
   if (!isEncodable(num)) {
-    throw new Error('number should be between range -2147483648 to 2147483647.')
+    throw new TypeError('number should be between range -2147483648 to 2147483647.')
   }
 
   const buflen = buf.length
@@ -56,7 +56,7 @@ const encode = (buf, num) => {
 }
 
 const isEncodable = num => {
-  return (num <= 2147483647) ||  (num >= -2147483648)
+  return (num <= 2147483647) && (num >= -2147483648)
 }
 
 const fitsInBase256 = (buflength, num) => {

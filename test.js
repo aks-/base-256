@@ -61,6 +61,11 @@ const testEncoder = () => {
   })
 }
 
+const testErrorCase = () => {
+  const buf = new Buffer("\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 'binary')
+  assert.throws(() => { encode(buf, 2147483648) }, TypeError)
+}
+
 const areBuffersEqual = (buf, buf2) => {
   if (buf.length !== buf2.length) return false 
 
@@ -74,3 +79,4 @@ const areBuffersEqual = (buf, buf2) => {
 
 testDecoder()
 testEncoder()
+testErrorCase()
