@@ -36,19 +36,6 @@ const decode = buf => {
   return num
 }
 
-const isEncodable = num => {
-  return (num <= 2147483647) ||  (num >= -2147483648)
-}
-
-const fitsInBase256 = (buflength, num) => {
-  var binBits = (buflength -1) * 8
-  return buflength >= 9 ||
-    (
-      (num >= (-1 << binBits)) &&
-      (num < (1 << binBits))
-    )
-}
-
 const encode = (buf, num) => {
   if (!isEncodable(num)) {
     throw new Error('number should be between range -2147483648 to 2147483647.')
@@ -66,6 +53,19 @@ const encode = (buf, num) => {
 
     buf[0] |= 0x80
   }
+}
+
+const isEncodable = num => {
+  return (num <= 2147483647) ||  (num >= -2147483648)
+}
+
+const fitsInBase256 = (buflength, num) => {
+  var binBits = (buflength -1) * 8
+  return buflength >= 9 ||
+    (
+      (num >= (-1 << binBits)) &&
+      (num < (1 << binBits))
+    )
 }
 
 module.exports = {
