@@ -3,12 +3,12 @@ const { encode, decode } = require('./base-256')
 
 const testDecoder = () => {
   const inputOutputPairs = [["", 0],
-    ["\x80", 0],
+    ["\x82\x32\x80", 0, 2],
     ["\x80\x00", 0],
     ["\x80\x00\x00", 0],
     ["\xbf", (1 << 6) - 1],
     ["\xbf\xff", (1 << 14) - 1],
-    ["\xbf\xff\xff", (1 << 22) - 1],
+    ["\xbb\xbf\xff\xff", (1 << 22) - 1, 1],
     ["\xff", -1],
     ["\xff\xff", -1],
     ["\xff\xff\xff", -1],
@@ -16,7 +16,7 @@ const testDecoder = () => {
     ["\xc0\x00", -1 * (1 << 14)],
     ["\xc0\x00\x00", -1 * (1 << 22)],
     ["\x80\x7f\xff\xff\xff", 2147483647],
-    ["\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 2147483647],
+    ["\x11\x11\x11\x11\x11\x11\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 2147483647, 6],
     ["\xff\x80\x00\x00\x00", -2147483648],
     ["\xff\xff\xff\xff\x80\x00\x00\x00", -2147483648],
     ["\x80\x7f\xff\xff\xff\xff\xff\xff\xff", 0],
@@ -27,7 +27,8 @@ const testDecoder = () => {
 
   inputOutputPairs.forEach(pair => {
     const buf = new Buffer(pair[0], 'binary')
-    const decodedBigNum = decode(buf)
+    const offset = pair[2]
+    const decodedBigNum = decode(buf, offset)
     assert.equal(decodedBigNum, pair[1])
   })
 }

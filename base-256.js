@@ -1,20 +1,20 @@
-const decode = buf => {
+const decode = ( buf, offset = 0 ) => {
   if (!Buffer.isBuffer(buf)) {
     throw new TypeError('decode only accepts buffer.')
   }
 
   var num = 0
-  if (buf.length > 0 && (buf[0]&0x80) != 0) {
+  if (buf.length > 0 && (buf[offset]&0x80) != 0) {
     var byte = 0x00
     if (!!(buf[0]&0x40) != 0) {
       byte = 0xff
     }
 
-    for (var i = 0; i < buf.length; i++) {
+    for (var i = offset; i < buf.length; i++) {
       var c = buf[i]
       c ^= byte
 
-      if (i === 0) {
+      if (i === offset) {
         c &= 0x7f
       }
 
