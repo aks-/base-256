@@ -28,8 +28,8 @@ const decodedValue = decode(buf)
 `base256.encode(buffer, num)`
 Pass a buffer and the number that needs to be encoded. The number will be encoded into that buffer.
 
-`base256.decode(buf)`
-Decode a number from a buffer
+`base256.decode(buf, [offset])`
+Decode a number from a buffer. If an offset is passed as the second argument the buf should be decoded at that byte offset. The byte offset defaults to 0.
 
 ## Errors
 - Throws `TypeError` if the input yields a number that is out of range (-2147483648 to 2147483647).
