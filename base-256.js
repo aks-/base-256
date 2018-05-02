@@ -20,7 +20,15 @@ const decode = ( buf, offset = 0 ) => {
         c &= 0x7f
       }
 
+      if (Math.abs(num) > (Number.MAX_SAFE_INTEGER - Math.pow(2, 8))) {
+        throw new TypeError('Result out of range.')
+      }
+
       num = (leftShift(num, 8)) | c
+    }
+
+    if (Math.abs(num) > (Number.MAX_SAFE_INTEGER - 1)) {
+      throw new TypeError('Result out of range.')
     }
 
     if (byte === 0xff) {
