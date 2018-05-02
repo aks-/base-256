@@ -1,6 +1,6 @@
 # base-256
 
-encode and decode base256 encoding  as gnu-tar does (supported range is -2147483648 to 2147483647)
+encode and decode base256 encoding  as gnu-tar does (supported range is -9007199254740991 to 9007199254740991).
 
 ```
 npm install base-256
@@ -32,8 +32,9 @@ Pass a buffer and the number that needs to be encoded. The number will be encode
 Decode a number from a buffer. If an offset is passed as the second argument the buf should be decoded at that byte offset. The byte offset defaults to 0.
 
 ## Errors
-- Throws `TypeError` if the input yields a number that is out of range (-2147483648 to 2147483647).
+- Throws `TypeError` if the input yields a number that is out of range (-9007199254740991 to 9007199254740991).
 - Throws `TypeError` if the input is of not correct type.
+- Throws `TypeError` if the output of decoded value of encoded buffer goes out of range -9007199254740991 to 9007199254740735. 
 
 ## License
 
