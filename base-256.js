@@ -1,3 +1,5 @@
+const { leftShift, rightShift } = require('./shift-operators')
+
 const decode = ( buf, offset = 0 ) => {
   if (!Buffer.isBuffer(buf)) {
     throw new TypeError('decode only accepts buffer.')
@@ -18,26 +20,30 @@ const decode = ( buf, offset = 0 ) => {
         c &= 0x7f
       }
 
-      if ((num >>> 24) > 0) {
-        return 0
+      if (Math.abs(num) > (Number.MAX_SAFE_INTEGER - Math.pow(2, 8))) {
+        throw new TypeError('Result out of range.')
       }
 
-      num = (num << 8) | c
-    }
-
-    if ((num >>> 31) > 0) {
-      return 0
+      num = (leftShift(num, 8)) + c
     }
 
     if (byte === 0xff) {
+      throwIfOutOfRange(num)
       num += 1
       return -num
     }
 
+    throwIfOutOfRange(num)
     return num
   }
 
   return num
+}
+
+const throwIfOutOfRange = n => {
+  if (n < Number.MIN_SAFE_INTEGER || n > Number.MAX_SAFE_INTEGER) {
+    throw new TypeError('Result out of range.')
+  }
 }
 
 const encode = (buf, num) => {
@@ -52,7 +58,7 @@ const encode = (buf, num) => {
   }
 
   if (!isEncodable(num)) {
-    throw new TypeError('number should be between range -2147483648 to 2147483647.')
+    throw new TypeError('number should be between range -9007199254740991 to 9007199254740991.')
   }
 
   const buflen = buf.length
@@ -62,7 +68,7 @@ const encode = (buf, num) => {
     for (var i = buflen - 1; i >= 0; i--) {
       const byte = num & 0xFF
       buf[bufPointer--] = byte
-      num >>= 8
+      num = rightShift(num, 8)
     }
 
     buf[0] |= 0x80
@@ -70,15 +76,15 @@ const encode = (buf, num) => {
 }
 
 const isEncodable = num => {
-  return (num <= 2147483647) && (num >= -2147483648)
+  return (num > Number.MIN_SAFE_INTEGER && num < Number.MAX_SAFE_INTEGER)
 }
 
 const fitsInBase256 = (buflength, num) => {
   var binBits = (buflength -1) * 8
   return buflength >= 9 ||
     (
-      (num >= (-1 << binBits)) &&
-      (num < (1 << binBits))
+      (num >= (leftShift(-1, binBits))) &&
+      (num < (leftShift(1, binBits)))
     )
 }
 

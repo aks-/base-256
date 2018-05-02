@@ -19,11 +19,8 @@ const testDecoder = () => {
     ["\x11\x11\x11\x11\x11\x11\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 2147483647, 6],
     ["\xff\x80\x00\x00\x00", -2147483648],
     ["\xff\xff\xff\xff\x80\x00\x00\x00", -2147483648],
-    ["\x80\x7f\xff\xff\xff\xff\xff\xff\xff", 0],
-    ["\x80\x80\x00\x00\x00\x00\x00\x00\x00", 0],
-    ["\xff\x80\x00\x00\x00\x00\x00\x00\x00", 0],
-    ["\xff\x7f\xff\xff\xff\xff\xff\xff\xff", 0],
-    ["\xf5\xec\xd1\xc7\x7e\x5f\x26\x48\x81\x9f\x8f\x9b", 0]]
+    ["\x80\x00\x00\x1f\xff\xff\xff\xff\xfe\xff", Number.MAX_SAFE_INTEGER - Math.pow(2, 8)],
+    ["\xff\xff\xff\xe0\x00\x00\x00\x00\x01\x01", -1 * (Number.MAX_SAFE_INTEGER - Math.pow(2, 8))]]
 
   inputOutputPairs.forEach(pair => {
     const buf = new Buffer(pair[0], 'binary')
@@ -51,7 +48,9 @@ const testEncoder = () => {
     [2147483647, "\x80\x7f\xff\xff\xff"],
     [2147483647, "\x80\x00\x00\x00\x00\x7f\xff\xff\xff"],
     [-2147483648, "\xff\x80\x00\x00\x00"],
-    [-2147483648, "\xff\xff\xff\xff\x80\x00\x00\x00"]]
+    [-2147483648, "\xff\xff\xff\xff\x80\x00\x00\x00"],
+    [Number.MAX_SAFE_INTEGER - Math.pow(2, 8), "\x80\x00\x00\x1f\xff\xff\xff\xff\xfe\xff"],
+    [-1 * (Number.MAX_SAFE_INTEGER - Math.pow(2, 8)), "\xff\xff\xff\xe0\x00\x00\x00\x00\x01\x01"]]
 
   inputOutputPairs.forEach(pair => {
     const tempbuf = new Buffer(pair[1], 'binary')
@@ -68,6 +67,20 @@ const testErrors = () => {
 }
 
 const testDecoderErrors = () => {
+  [
+    "\x80\x7f\xff\xff\xff\xff\xff\xff\xff",
+    "\x80\x80\x00\x00\x00\x00\x00\x00\x00",
+    "\xff\x80\x00\x00\x00\x00\x00\x00\x00",
+    "\xff\x7f\xff\xff\xff\xff\xff\xff\xff",
+    "\xf5\xec\xd1\xc7\x7e\x5f\x26\x48\x81\x9f\x8f\x9b"
+  ].forEach(b => {
+    const buf = new Buffer(b, 'binary')
+    assert.throws(
+      () => { decode(buf) },
+      /^TypeError: Result out of range.$/
+    )
+  })
+
   assert.throws(
     () => { decode({}) },
     /^TypeError: decode only accepts buffer.$/
@@ -77,8 +90,8 @@ const testDecoderErrors = () => {
 const testEncoderErrors = () => {
   const buf = new Buffer("\x80\x00\x00\x00\x00\x7f\xff\xff\xff", 'binary')
   assert.throws(
-    () => { encode(buf, 2147483648) },
-    /^TypeError: number should be between range -2147483648 to 2147483647.$/
+    () => { encode(buf, Number.MAX_SAFE_INTEGER) },
+    /^TypeError: number should be between range -9007199254740991 to 9007199254740991.$/
   )
 
   assert.throws(
